@@ -3,7 +3,7 @@ let songs = [
         name: "Beneath The Streetlights And The Moon",
         artist: "JP Cooper",
         img: "ab67616d0000b273c27b53492a2ee7fcebd74d6e",
-        audio : "JP Cooper- Beneath The Streetlights And The Moon (Audio + Lyrics) (1)"
+        audio : "y2mate.com - Beneath The Streetlights And The Moon"
     },
 
     {
