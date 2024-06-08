@@ -10,7 +10,8 @@ const content = document.querySelector(".content"),
     nextBtn = content.querySelector("#next"),
     progressBar = content.querySelector(".prg-bar"),
     progressDetails = content.querySelector(".prg-details"),
-    repeatBtn = content.querySelector("#repeat");
+    repeatBtn = content.querySelector("#repeat"),
+    loadingSpinner = document.getElementById("loading-spinner");
 
 let index = 0;
 let isRepeat = false;
@@ -19,14 +20,19 @@ let nextAudio = new Audio();
 window.addEventListener("load", () => {
     loadData(index);
     pauseSong(); // Pause the first song on load
+    preloadNextAudio(index);
 });
 
 function loadData(indexValue) {
+    showLoadingSpinner();
     musicName.innerText = songs[indexValue].name;
     musicArtist.innerText = songs[indexValue].artist;
     playImage.src = "images/" + songs[indexValue].img + ".jpg";
     audio.src = "music/" + songs[indexValue].audio + ".mp3";
+    audio.preload = "metadata";
+    audio.load();
     preloadNextAudio(indexValue);
+    audio.addEventListener('canplaythrough', hideLoadingSpinner, { once: true });
 }
 
 playBtn.addEventListener("click", () => {
@@ -131,5 +137,14 @@ function preloadNextAudio(currentIndex) {
         nextIndex = 0;
     }
     nextAudio.src = "music/" + songs[nextIndex].audio + ".mp3";
+    nextAudio.preload = "metadata";
     nextAudio.load(); // Preload the next audio file
+}
+
+function showLoadingSpinner() {
+    loadingSpinner.style.display = "block";
+}
+
+function hideLoadingSpinner() {
+    loadingSpinner.style.display = "none";
 }
