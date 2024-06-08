@@ -159,11 +159,29 @@ body {
 
 @media (max-width: 500px) {
     .content {
-        width: 80%;
+        width: 90%;
         height: 100vh;
     }
-
-    body {
-        display: one;
+}
+@media (max-width: 315px){
+    .control-btn .material-symbols-outlined{
+        margin-left: 2px;
     }
 }
+
+
+.loading-spinner {
+    display: none; /* Hidden by default */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 18px;
+    color: #6a1b9a;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 10px 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+  }
+  
