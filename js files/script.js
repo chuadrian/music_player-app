@@ -1,18 +1,20 @@
 
 const content = document.querySelector(".content"),
-      playImage = content.querySelector(".music-img img"),
-      musicName = content.querySelector(".music-titles .name"),
-      musicArtist = content.querySelector(".music-titles .artist"),
-      audio = document.querySelector(".main-song"),
-      playBtn = content.querySelector(".play-pause"),
-      playBtnIcon = content.querySelector(".play-pause span"),
-      prevBtn = content.querySelector("#prev"),
-      nextBtn = content.querySelector("#next"),
-      progressBar = content.querySelector(".prg-bar"),
-      progressDetails = content.querySelector(".prg-details");
-      repeatBtn = content.querySelector("#repeat");
+    playImage = content.querySelector(".music-img img"),
+    musicName = content.querySelector(".music-titles .name"),
+    musicArtist = content.querySelector(".music-titles .artist"),
+    audio = document.querySelector(".main-song"),
+    playBtn = content.querySelector(".play-pause"),
+    playBtnIcon = content.querySelector(".play-pause span"),
+    prevBtn = content.querySelector("#prev"),
+    nextBtn = content.querySelector("#next"),
+    progressBar = content.querySelector(".prg-bar"),
+    progressDetails = content.querySelector(".prg-details"),
+    repeatBtn = content.querySelector("#repeat");
 
 let index = 0;
+let isRepeat = false;
+let nextAudio = new Audio();
 
 window.addEventListener("load", () => {
     loadData(index);
@@ -24,6 +26,7 @@ function loadData(indexValue) {
     musicArtist.innerText = songs[indexValue].artist;
     playImage.src = "images/" + songs[indexValue].img + ".jpg";
     audio.src = "music/" + songs[indexValue].audio + ".mp3";
+    preloadNextAudio(indexValue);
 }
 
 playBtn.addEventListener("click", () => {
@@ -38,7 +41,10 @@ playBtn.addEventListener("click", () => {
 function playSong() {
     content.classList.add("paused");
     playBtnIcon.innerText = "pause";
-    audio.play();
+    audio.play().catch(error => {
+        console.error("Error playing audio:", error);
+        // Optional: Display an error message to the user
+    });
 }
 
 function pauseSong() {
@@ -97,9 +103,15 @@ audio.addEventListener("loadedmetadata", () => {
 });
 
 repeatBtn.addEventListener("click", () => {
-    isRepeat = true;
-    repeatBtn.classList.add("active");
-    playSong(); // Replay the current song
+    isRepeat = !isRepeat;
+    repeatBtn.classList.toggle("active", isRepeat);
+    audio.loop = isRepeat;
+});
+
+audio.addEventListener("ended", () => {
+    if (!isRepeat) {
+        nextSong();
+    }
 });
 
 function updateCurrentTime(time) {
@@ -111,4 +123,13 @@ function formatTime(time) {
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60).toString().padStart(2, '0');
     return `${minutes}:${seconds}`;
+}
+
+function preloadNextAudio(currentIndex) {
+    let nextIndex = currentIndex + 1;
+    if (nextIndex >= songs.length) {
+        nextIndex = 0;
+    }
+    nextAudio.src = "music/" + songs[nextIndex].audio + ".mp3";
+    nextAudio.load(); // Preload the next audio file
 }
