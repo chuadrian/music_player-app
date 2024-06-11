@@ -11,15 +11,22 @@ const content = document.querySelector(".content"),
     progressBar = content.querySelector(".prg-bar"),
     progressDetails = content.querySelector(".prg-details"),
     repeatBtn = content.querySelector("#repeat"),
+    shuffleBtn = content.querySelector("#shuffle"),
     loadingSpinner = document.getElementById("loading-spinner");
+    moreOptions = document.getElementById("more-options");
+    lyricsModal = document.getElementById("lyrics-modal");
+    closeBtn = document.querySelector(".close-btn");
+    songLyricsElement = document.getElementById("song-lyrics");
 
 let index = 0;
 let isRepeat = false;
+let isShuffle = false;
 let nextAudio = new Audio();
+let shuffledIndexes = [];
 
 window.addEventListener("load", () => {
     loadData(index);
-    pauseSong(); // Pause the first song on load
+    pauseSong(); // pauses the first song on load
     preloadNextAudio(index);
 });
 
@@ -49,7 +56,7 @@ function playSong() {
     playBtnIcon.innerText = "pause";
     audio.play().catch(error => {
         console.error("Error playing audio:", error);
-        // Optional: Display an error message to the user
+        // this is optional : Display an error message to the user
     });
 }
 
@@ -64,9 +71,16 @@ nextBtn.addEventListener("click", () => {
 });
 
 function nextSong() {
-    index++;
-    if (index >= songs.length) {
-        index = 0;
+    if (isShuffle) {
+        index = shuffledIndexes.pop();
+        if (shuffledIndexes.length === 0) {
+            generateShuffleIndexes();
+        }
+    } else {
+        index++;
+        if (index >= songs.length) {
+            index = 0;
+        }
     }
     loadData(index);
     playSong();
@@ -114,6 +128,14 @@ repeatBtn.addEventListener("click", () => {
     audio.loop = isRepeat;
 });
 
+shuffleBtn.addEventListener("click", () => {
+    isShuffle = !isShuffle;
+    shuffleBtn.classList.toggle("active", isShuffle);
+    if (isShuffle) {
+        generateShuffleIndexes();
+    }
+});
+
 audio.addEventListener("ended", () => {
     if (!isRepeat) {
         nextSong();
@@ -138,7 +160,7 @@ function preloadNextAudio(currentIndex) {
     }
     nextAudio.src = "music/" + songs[nextIndex].audio + ".mp3";
     nextAudio.preload = "metadata";
-    nextAudio.load(); // Preload the next audio file
+    nextAudio.load(); // preloads the next audio file
 }
 
 function showLoadingSpinner() {
@@ -148,3 +170,31 @@ function showLoadingSpinner() {
 function hideLoadingSpinner() {
     loadingSpinner.style.display = "none";
 }
+
+function generateShuffleIndexes() {
+    shuffledIndexes = Array.from({ length: songs.length }, (_, i) => i).sort(() => Math.random() - 0.5);
+    if (shuffledIndexes[shuffledIndexes.length - 1] === index) {
+        shuffledIndexes.unshift(shuffledIndexes.pop());
+    }
+}
+
+function showLyrics() {
+    const currentSong = songs[index];
+    songLyricsElement.innerText = currentSong.lyrics;
+    lyricsModal.style.display = "block";
+}
+
+// Event listener for more options icon
+moreOptions.addEventListener("click", showLyrics);
+
+// Event listener for close button
+closeBtn.addEventListener("click", () => {
+    lyricsModal.style.display = "none";
+});
+
+// Close the modal when clicking outside of it
+window.addEventListener("click", (event) => {
+    if (event.target === lyricsModal) {
+        lyricsModal.style.display = "none";
+    }
+});
